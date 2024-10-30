@@ -1,0 +1,59 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+import time
+import sys
+
+option = webdriver.ChromeOptions()
+option.add_argument("--no-sandbox")
+option.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+service = Service(executeable_path=f"D:\22.83.0885\ChromeDriver\chromedriver-win64\chromedriver-win64\chromedriver.exe")
+wd = webdriver.Chrome(service=service, options=option)
+
+keyword = input("Masukkan keywordnya: ")
+
+try:
+    ext_page = ''
+    wd.get(f"https://sinta.kemdikbud.go.id/journals?q={keyword}")
+    get_page = wd.find_element(By.XPATH, "div[@class='text-center pagination-text']")
+    get_page = get_page.text
+    ext_page = get_page.split(" ")
+
+    if ext_page[3] == '':
+        ext_page = 1
+    else:
+        ext_page = ext_page[3]
+
+except:
+    print("Keyword Not Found")
+    sys.exit()
+
+finally:
+    ext_page
+
+print(f"Jumlah Page ada: {ext_page}")
+new_data_page = int(input("Berapa page yang akan ditampilkan??? : "))
+ext_page = int(ext_page)
+
+if ext_page < new_data_page:
+    print("Jumlah page yang dimasukkan melebihi batas")
+    print("page akan diset menjadi 1")
+    ext_page = 1 
+else:
+    ext_page = new_data_page
+
+for page in range(ext_page):
+    wd.get(f"https://sinta.kemdikbud.go.id/journals?page={page+1}&q={keyword}")
+    time.sleep(3)
+    detail = wd.find_elements(By.XPATH, "//div[@class='affil-name mb-3']")
+
+    print(f"Page: {page+1}")
+
+    for q in detail:
+        print('__\__', q.text)
+
+    time.sleep(3)
+
+
+
